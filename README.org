@@ -1,0 +1,58 @@
+* statish
+You want to run a shellscript on some machine, but it doesn't have all of the binaries your script needs?
+Try statish! Using the awesome power of ❄️nixpkgs❄️ and some truly horrendous ELF magic,
+it combines your script & all of its dependencies into a single, statically-linked executable!
+
+** Usage
+#+begin_src nix
+    # flake.nix
+
+    {
+      inputs = {
+        statish = {
+          url = "github:42LoCo42/statish";
+
+          # optional
+          # inputs.flake-utils.follows = "flake-utils";
+          # inputs.nixpkgs.follows = "nixpkgs";
+        };
+      };
+
+      outputs = { flake-utils, nixpkgs, statish, ... }:
+        flake-utils.lib.eachDefaultSystem (system:
+          let pkgs = import nixpkgs { inherit system; }; in {
+            packages.default = statish.lib.mkstatish {
+              name = "example";
+              bins = [ "curl" ];
+              inherit pkgs;
+
+              text = ''
+                echo "henlo wrold :3"
+                echo "my IP is $(curl -s https://ip.me)"
+              '';
+
+              # shell = "bash";
+              # the default shell is bash
+              # set to null to directly launch the script
+              # (using its shebang to find the interpreter)
+            };
+          });
+    }
+#+end_src
+
+** Under the hood
+Using Golang, we create a statically-linked "template" loader
+that reads its own binary file, finds the =statish= section
+and unpacks it (as a tar-zstd archive) into a temporary folder.
+
+It also reads a shell name from the =statish-shell= section.
+If this was successful, it executes the given shell in the tempdir,
+giving it the name of the script (always =main=) as well as any
+arguments passed to the loader.
+
+If no shell was found, it instead directly executes the =main= file
+(but still gives it any passed arguments).
+
+The template loader is "instantiated" by the =lib.mkstatish= function
+exposed by this flake, which creates the correct binaries archive
+and attaches it as well as the shell name (if specified) to its output.

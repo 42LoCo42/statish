@@ -36,8 +36,6 @@ func start() error {
 		return err
 	}
 
-	log.Print(cmd)
-
 	if err := cmd.Run(); err != nil {
 		return errors.Wrap(err, "child process failed")
 	}

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-echo "hi from test"
-echo "PATH is $PATH"
-echo "$# args"
-echo "$0" "$@"
-ls -hl "$(dirname "$0")"
-read -rp "press enter to quit"
+echo "henlo wrold :3"
+echo "script is $0 with $# args passed:"
+for i in "$@"; do
+	printf '\t[%s]\n' "$i"
+done
+echo "my IP is $(curl -s https://ip.me)"
