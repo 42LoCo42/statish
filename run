@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -eEuo pipefail
+
+rm -f statish
+CGO_ENABLED=0 go build -ldflags="-s -w"
+
+find "$PWD/test" -not -type d \
+| tar c -T- --transform 's|.*/||' --zstd \
+| objcopy --add-section statish=/dev/stdin statish
+
+exec ./statish test a b "c d"

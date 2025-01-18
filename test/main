@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+echo "hi from test"
+echo "PATH is $PATH"
+echo "$# args"
+echo "$0" "$@"
+ls -hl "$(dirname "$0")"
+read -rp "press enter to quit"
