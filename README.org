@@ -53,6 +53,9 @@ arguments passed to the loader.
 If no shell was found, it instead directly executes the =main= file
 (but still gives it any passed arguments).
 
-The template loader is "instantiated" by the =lib.mkstatish= function
-exposed by this flake, which creates the correct binaries archive
-and attaches it as well as the shell name (if specified) to its output.
+The template loader is "instantiated"
+by the =lib.mkstatish= function exposed by this flake,
+which looks up all of the requested =bins= (and the shell)
+in the =pkgsStatic= subset of =nixpkgs=.
+It then generates the corresponding archive and attaches it
+as well as the shell name to its output copy of the loader.
