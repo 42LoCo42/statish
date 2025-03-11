@@ -21,19 +21,21 @@
             zstd
           ];
         }) ''
-          cp ${pkgs.lib.getExe self.packages.${pkgs.system}.statish} $out
-          chmod +w $out
+          cp ${pkgs.lib.getExe self.packages.${pkgs.system}.statish} bin
+          chmod +w bin
 
           for i in ${paths} ${script}; do echo "$i"; done
 
           find ${paths} ${script} -not -type d     \
           | tar c -T- --transform 's|.*/||' --zstd \
-          | objcopy --add-section statish=/dev/stdin $out
+          | objcopy --add-section statish=/dev/stdin bin
 
           ${if shell == null then "" else ''
             <<< "${shell}" \
-            objcopy --add-section statish-shell=/dev/stdin $out
+            objcopy --add-section statish-shell=/dev/stdin bin
           ''}
+
+          install -Dm755 bin $out/bin/${name}
         '')
       ];
   } // flake-utils.lib.eachDefaultSystem (system:
